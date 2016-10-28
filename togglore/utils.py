@@ -1,0 +1,77 @@
+import datetime
+import calendar
+
+
+def sum_time_of_entries(entries):
+    ms = 0
+
+    for entry in entries:
+        ms += entry['dur']
+
+    return ms / 3600000.0
+
+
+class WorkTimeCalculator(object):
+    def __init__(self):
+        self.work_hours_per_day = 8.4
+
+    def count_workdays_in_range(self, date_range):
+        current = date_range.start
+        workdays = 0
+
+        while current <= date_range.end:
+            if current.isoweekday() not in [6, 7]:
+                workdays += 1
+
+            current += datetime.timedelta(1)
+
+        return workdays
+
+    def time_to_work_in_range(self, date_range):
+        weekdays = self.count_workdays_in_range(date_range)
+
+        return weekdays * self.work_hours_per_day
+
+
+class DateRange(object):
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+
+    @classmethod
+    def today(cls):
+        return cls(datetime.date.today(), datetime.date.today())
+
+    @classmethod
+    def this_week(cls):
+        today = datetime.date.today()
+        start = today - datetime.timedelta(today.weekday())
+        end = start + datetime.timedelta(6)
+
+        return cls(start, end)
+
+    @classmethod
+    def this_month(cls):
+        today = datetime.date.today()
+        __, end_day = calendar.monthrange(today.year, today.month)
+        start = datetime.date(today.year, today.month, 1)
+        end = datetime.date(today.year, today.month, end_day)
+
+        return cls(start, end)
+
+    @classmethod
+    def this_year(cls):
+        today = datetime.date.today()
+        start = datetime.date(today.year, 1, 1)
+        end = datetime.date(today.year, 12, 31)
+
+        return cls(start, end)
+
+    @classmethod
+    def month(cls, month):
+        today = datetime.date.today()
+        __, end_day = calendar.monthrange(today.year, month)
+        start = datetime.date(today.year, month, 1)
+        end = datetime.date(today.year, month, end_day)
+
+        return cls(start, end)
