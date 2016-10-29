@@ -39,6 +39,12 @@ class DateRange(object):
         self.end = end
 
     @classmethod
+    def parse_from_iso_strings(cls, start, end):
+        start = datetime.datetime.strptime(start, "%d.%m.%Y").date()
+        end = datetime.datetime.strptime(end, "%d.%m.%Y").date()
+        return cls(start, end)
+
+    @classmethod
     def today(cls):
         return cls(datetime.date.today(), datetime.date.today())
 

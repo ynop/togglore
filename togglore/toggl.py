@@ -52,8 +52,3 @@ class TogglClient(object):
 
         return entries
 
-    def diff(self, date_range):
-        actual_hours = utils.sum_time_of_entries(self.time_entries(date_range))
-        expected_hours = utils.WorkTimeCalculator().time_to_work_in_range(date_range)
-
-        return actual_hours - expected_hours
