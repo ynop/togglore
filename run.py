@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    client = togglore.Togglore('68355aba1d7c5a2f397aea637681ac0a')
+    client = togglore.Togglore()
 
     expected = 0
     actual = 0
