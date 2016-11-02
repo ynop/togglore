@@ -33,3 +33,9 @@ python3 run.py month 08
 # show diff from 2016.08.01 until today
 python3 run.py since 2016.08.01
 ```
+The output is something like:
+```
+Hours to do: 184.8
+Hours worked: 180.435
+Difference: -4.365000000000009
+```
