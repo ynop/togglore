@@ -1,5 +1,4 @@
 import argparse
-import datetime
 
 import togglore
 from togglore import utils
@@ -15,9 +14,13 @@ if __name__ == '__main__':
     parser_range.add_argument('to_date', help='enddate, e.g. 12.10.2016')
 
     parser_year = subparsers.add_parser('thisyear', help='today help')
-    parser_month = subparsers.add_parser('thismonth', help='month help')
+    parser_thismonth = subparsers.add_parser('thismonth', help='month help')
     parser_week = subparsers.add_parser('thisweek', help='week help')
     parser_today = subparsers.add_parser('today', help='day help')
+    parser_month = subparsers.add_parser('month', help='month help')
+    parser_month.add_argument('month', help='month e.g. 08')
+    parser_since = subparsers.add_parser('since', help='since help')
+    parser_since.add_argument('since', help='since e.g. 2016.08.01')
 
     args = parser.parse_args()
 
@@ -36,6 +39,10 @@ if __name__ == '__main__':
         actual, expected = client.diff(utils.DateRange.this_week())
     elif args.command == 'today':
         actual, expected = client.diff(utils.DateRange.today())
+    elif args.command == 'month':
+        actual, expected = client.diff(utils.DateRange.month(int(args.month)))
+    elif args.command == 'since':
+        actual, expected = client.diff(utils.DateRange.since(args.since))
 
     print("Hours to do: {}".format(expected))
     print("Hours worked: {}".format(actual))

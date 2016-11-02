@@ -4,8 +4,6 @@ import urllib.parse
 import base64
 import json
 
-from togglore import utils
-
 
 class TogglClient(object):
     def __init__(self, api_token):

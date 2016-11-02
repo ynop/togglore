@@ -12,15 +12,16 @@ def sum_time_of_entries(entries):
 
 
 class WorkTimeCalculator(object):
-    def __init__(self):
-        self.work_hours_per_day = 8.4
+    def __init__(self, work_hours_per_day=8.4, excluded_days=[]):
+        self.work_hours_per_day = work_hours_per_day
+        self.excluded_days = excluded_days
 
     def count_workdays_in_range(self, date_range):
         current = date_range.start
         workdays = 0
 
         while current <= date_range.end:
-            if current.isoweekday() not in [6, 7]:
+            if current.isoweekday() not in [6, 7] and current not in self.excluded_days:
                 workdays += 1
 
             current += datetime.timedelta(1)
@@ -37,6 +38,12 @@ class DateRange(object):
     def __init__(self, start, end):
         self.start = start
         self.end = end
+
+    @classmethod
+    def since(cls, start):
+        start = datetime.datetime.strptime(start, "%Y.%m.%d").date()
+        end = datetime.date.today()
+        return cls(start, end)
 
     @classmethod
     def parse_from_iso_strings(cls, start, end):
