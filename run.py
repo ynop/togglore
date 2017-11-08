@@ -44,7 +44,9 @@ if __name__ == '__main__':
     elif args.command == 'since':
         actual, expected = client.diff(utils.DateRange.since(args.since))
 
-    print("Hours to do: {}".format(expected))
-    print("Hours worked: {}".format(actual))
+    print("Hours to do: {0:.2f}h ({1:.2f} days)".format(expected, expected/client.cfg.work_hours_per_day))
+    print("Hours worked: {0:.2f}h ({1:.2f} days)".format(actual, actual/client.cfg.work_hours_per_day))
 
-    print("Difference: {}".format(actual-expected))
+    difference = actual-expected
+    print("Difference: {0:.2f}h ({1:.2f} days)".format(difference, difference/client.cfg.work_hours_per_day))
+

@@ -47,8 +47,8 @@ class DateRange(object):
 
     @classmethod
     def parse_from_iso_strings(cls, start, end):
-        start = datetime.datetime.strptime(start, "%d.%m.%Y").date()
-        end = datetime.datetime.strptime(end, "%d.%m.%Y").date()
+        start = datetime.datetime.strptime(start, "%Y.%m.%d").date()
+        end = datetime.datetime.strptime(end, "%Y.%m.%d").date()
         return cls(start, end)
 
     @classmethod

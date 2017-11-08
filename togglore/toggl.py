@@ -6,8 +6,10 @@ import json
 
 
 class TogglClient(object):
-    def __init__(self, api_token):
+    def __init__(self, api_token, user_id, workspace):
         self.api_token = api_token
+        self.user_id = user_id
+        self.workspace = workspace
         self.headers = {}
         self.__init_headers()
 
@@ -42,11 +44,13 @@ class TogglClient(object):
         while current_page * per_page < total:
             current_page += 1
             response = self.request(
-                'https://toggl.com/reports/api/v2/details?workspace_id=730096&since={}&until={}&user_agent=api_test&page={}'.format(
-                    date_range.start.isoformat(), date_range.end.isoformat(), current_page))
+                'https://toggl.com/reports/api/v2/details?workspace_id={}&since={}&until={}&user_agent=togglore&page={}'.format(
+                    self.workspace, date_range.start.isoformat(), date_range.end.isoformat(), current_page))
             total = response['total_count']
             per_page = response['per_page']
-            entries.extend(response['data'])
+            for time in response['data']:
+                if str(time['uid']) == self.user_id:
+                    entries.append(time)
 
         return entries
 
