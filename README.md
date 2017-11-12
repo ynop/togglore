@@ -10,7 +10,11 @@ API_KEY = 5b9f5e3fd7745a022781daf205f62c72
 
 [Work Hours]
 hours_per_day = 8.4
-excluded_days = 2016-08-01,2016-12-24
+excluded_days = 2016.01.01
+
+[User Info]
+id = 1
+workspace = 1
 ```
 
 ## Run
@@ -35,7 +39,7 @@ python3 run.py since 2016.08.01
 ```
 The output is something like:
 ```
-Hours to do: 184.8
-Hours worked: 180.435
-Difference: -4.365000000000009
+Hours to do: 176.00h (22.00 days)
+Hours worked: 186.65h (23.33 days)
+Difference: 10.65h (1.33 days)
 ```
