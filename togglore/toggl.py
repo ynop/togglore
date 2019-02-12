@@ -1,8 +1,16 @@
 import urllib
-import urllib.request
-import urllib.parse
 import base64
 import json
+
+try:
+    from urllib.parse import urlparse
+except ImportError:
+     from urlparse import urlparse
+
+try:
+    import urllib.request
+except ImportError:
+     import request
 
 
 class TogglClient(object):

@@ -50,3 +50,14 @@ if __name__ == '__main__':
     difference = actual-expected
     print("Difference: {0:.2f}h ({1:.2f} days)".format(difference, difference/client.cfg.work_hours_per_day))
 
+    vacation_days_used = client.cfg.vacation_days
+    vacation_days_per_year = client.cfg.vacation_days_per_year
+    started_on = client.cfg.started_on
+    demand = utils.calculate_vacation_demand(started_on, vacation_days_per_year)
+
+    print("Difference Worktime: {0:.2f}h ({1:.2f} days)".format(
+        difference, difference / client.cfg.work_hours_per_day)
+    )
+    print("Difference Vacation: {}d of {}d used".format(
+        len(vacation_days_used), demand)
+    )

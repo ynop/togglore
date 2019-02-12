@@ -11,7 +11,12 @@ class Togglore(object):
         self.cfg = config.Config.read_from_file(config_path)
 
         self.toggle = toggl.TogglClient(self.cfg.api_key, self.cfg.user_id, self.cfg.workspace)
-        self.time_calculator = utils.WorkTimeCalculator(work_hours_per_day=self.cfg.work_hours_per_day, excluded_days=self.cfg.excluded_days)
+        self.time_calculator = utils.WorkTimeCalculator(
+            work_hours_per_day=self.cfg.work_hours_per_day,
+            public_holidays=self.cfg.public_holidays,
+            vacation_days=self.cfg.vacation_days,
+            working_days=self.cfg.working_days
+        )
 
     def diff(self, date_range):
         actual_hours = utils.sum_time_of_entries(self.toggle.time_entries(date_range))

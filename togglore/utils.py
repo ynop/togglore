@@ -1,5 +1,11 @@
 import datetime
 import calendar
+import math
+
+
+def calculate_vacation_demand(entered_on, days_per_year):
+    diff = datetime.datetime.today().date() - entered_on
+    return math.ceil(diff.days / 365) * days_per_year
 
 
 def sum_time_of_entries(entries):
@@ -12,16 +18,20 @@ def sum_time_of_entries(entries):
 
 
 class WorkTimeCalculator(object):
-    def __init__(self, work_hours_per_day=8.4, excluded_days=[]):
+    def __init__(self, work_hours_per_day=8.4, public_holidays=None,
+                 vacation_days=None, working_days=None):
         self.work_hours_per_day = work_hours_per_day
-        self.excluded_days = excluded_days
+        self.vacation_days = vacation_days or []
+        self.public_holidays = public_holidays or []
+        self.working_days = working_days or []
 
     def count_workdays_in_range(self, date_range):
         current = date_range.start
         workdays = 0
-
+        working_days = self.working_days
+        excluded_days = self.vacation_days + self.public_holidays
         while current <= date_range.end:
-            if current.isoweekday() not in [6, 7] and current not in self.excluded_days:
+            if current.isoweekday() in working_days and current not in excluded_days:
                 workdays += 1
 
             current += datetime.timedelta(1)
