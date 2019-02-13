@@ -17,6 +17,19 @@ id = 1
 workspace = 1
 ```
 
+### where to get this info
+#### workspace id
+go to https://toggl.com/app/workspaces/ and edit the workspace, get the id from the URL
+#### api key
+https://toggl.com/app/profile on the bottom
+#### user id [id]
+make a get request to your workspace
+
+```sh
+curl -v -u {API_TOKEN}:api_token \
+-X GET https://www.toggl.com/api/v8/workspaces/{worksapce_id}/users
+```
+
 ## Run
 ```sh
 # show diff for today
