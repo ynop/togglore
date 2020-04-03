@@ -64,6 +64,7 @@ if __name__ == '__main__':
     )
     print(output_result)
 
+    print(f"Running: {'Yes' if running else 'No'}")
     print(f"Send notification when time is over: {'On' if args.notify else 'Off'}")
     print(f"Uses notify send when time is over: {'On' if args.uses_notify_send else 'Off'}")
     if args.notify and difference >= 0 and running:
