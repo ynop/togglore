@@ -13,8 +13,11 @@ class Togglore(object):
         self.toggle = toggl.TogglClient(self.cfg.api_key, self.cfg.user_id, self.cfg.workspace, self.cfg.project)
         self.time_calculator = utils.WorkTimeCalculator(work_hours_per_day=self.cfg.work_hours_per_day, excluded_days=self.cfg.excluded_days)
 
-    def diff(self, date_range):
+    def diff(self, date_range, include_running=False):
         actual_hours = utils.sum_time_of_entries(self.toggle.time_entries(date_range))
         expected_hours = self.time_calculator.time_to_work_in_range(date_range)
+        if include_running:
+            running_time_entry_hours = utils.get_time_of_running_entry(self.toggle.running_time_entry())
+            actual_hours = actual_hours + running_time_entry_hours
 
         return actual_hours, expected_hours

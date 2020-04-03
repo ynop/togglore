@@ -37,20 +37,18 @@ if __name__ == '__main__':
     if args.command == 'range':
         actual, expected = client.diff(utils.DateRange.parse_from_iso_strings(args.from_date, args.to_date))
     elif args.command == 'thisyear':
-        actual, expected = client.diff(utils.DateRange.this_year())
+        actual, expected = client.diff(utils.DateRange.this_year(), include_running=True)
     elif args.command == 'thismonth':
-        actual, expected = client.diff(utils.DateRange.this_month())
+        actual, expected = client.diff(utils.DateRange.this_month(), include_running=True)
     elif args.command == 'thisweek':
-        actual, expected = client.diff(utils.DateRange.this_week())
+        actual, expected = client.diff(utils.DateRange.this_week(), include_running=True)
     elif args.command == 'today':
-        actual, expected = client.diff(utils.DateRange.today())
+        actual, expected = client.diff(utils.DateRange.today(), include_running=True)
     elif args.command == 'month':
         actual, expected = client.diff(utils.DateRange.month(int(args.month)))
     elif args.command == 'since':
         actual, expected = client.diff(utils.DateRange.since(args.since))
 
-    print("Hours to do: {0:.2f}h ({1:.2f} days)".format(expected, expected/client.cfg.work_hours_per_day))
-    print("Hours worked: {0:.2f}h ({1:.2f} days)".format(actual, actual/client.cfg.work_hours_per_day))
 
     difference = actual-expected
     output_result = (

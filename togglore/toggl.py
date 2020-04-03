@@ -61,6 +61,16 @@ class TogglClient(object):
 
         return entries
 
+    def running_time_entry(self):
+        entry = None
+        url = "https://www.toggl.com/api/v8/time_entries/current"
+        response = self.request(url)
+        if (str(response['data']['wid']) == self.workspace and
+           str(response['data']['uid']) == self.user_id and
+           str(response['data']['pid']) == self.project):
+            entry = response['data']
+        return entry
+
 
     def _get_toggl_url(self, workspace_id, project_id, since, until, user_agent, page):
         url = (
