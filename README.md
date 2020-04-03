@@ -2,6 +2,8 @@
 
 Tool for the timetracker [toggle](http://toggl.com/) to calculate the difference between tracked time and the time you should have worked in a given range.
 
+![result](docs/result.jpg)
+
 ## Setup
 
 Create a virtual env using python3 and install the requirements.
