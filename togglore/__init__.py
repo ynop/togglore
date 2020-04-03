@@ -10,7 +10,7 @@ class Togglore(object):
         config_path = os.path.join(os.path.expanduser('~'), '.togglore')
         self.cfg = config.Config.read_from_file(config_path)
 
-        self.toggle = toggl.TogglClient(self.cfg.api_key, self.cfg.user_id, self.cfg.workspace)
+        self.toggle = toggl.TogglClient(self.cfg.api_key, self.cfg.user_id, self.cfg.workspace, self.cfg.project)
         self.time_calculator = utils.WorkTimeCalculator(work_hours_per_day=self.cfg.work_hours_per_day, excluded_days=self.cfg.excluded_days)
 
     def diff(self, date_range):
