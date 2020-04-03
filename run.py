@@ -22,6 +22,11 @@ if __name__ == '__main__':
     parser_since = subparsers.add_parser('since', help='since help')
     parser_since.add_argument('since', help='since e.g. 2016.08.01')
 
+    parser.add_argument(
+        '--notify',
+        action="store_true",
+    )
+
     args = parser.parse_args()
 
     client = togglore.Togglore()
@@ -48,5 +53,24 @@ if __name__ == '__main__':
     print("Hours worked: {0:.2f}h ({1:.2f} days)".format(actual, actual/client.cfg.work_hours_per_day))
 
     difference = actual-expected
-    print("Difference: {0:.2f}h ({1:.2f} days)".format(difference, difference/client.cfg.work_hours_per_day))
+    output_result = (
+        ("Hours to do: {0:.2f}h ({1:.2f} days)".format(expected, expected/client.cfg.work_hours_per_day)) + "\r\n" +
+        ("Hours worked: {0:.2f}h ({1:.2f} days)".format(actual, actual/client.cfg.work_hours_per_day)) + "\r\n" +
+        ("Difference: {0:.2f}h ({1:.2f} days)".format(difference, difference/client.cfg.work_hours_per_day))
+    )
+    print(output_result)
+
+    print(f"Send notification when time is over: {'On' if args.notify else 'Off'}")
+    if args.notify and difference > 0:
+        from gi import require_version
+        require_version('Notify', '0.7')
+        from gi.repository import Notify
+        Notify.init("Toggle Notifier")
+        notification=Notify.Notification.new(
+            f'Time to stop working (+{difference:.2f}h)',
+            ('-' * 112) + "\r\n" + output_result,
+            "dialog-information"
+        )
+        notification.set_timeout(0)
+        notification.show ()
 
