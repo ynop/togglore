@@ -27,6 +27,11 @@ if __name__ == '__main__':
         action="store_true",
     )
 
+    parser.add_argument(
+        '--uses_notify_send',
+        action="store_true",
+    )
+
     args = parser.parse_args()
 
     client = togglore.Togglore()
@@ -59,7 +64,8 @@ if __name__ == '__main__':
     print(output_result)
 
     print(f"Send notification when time is over: {'On' if args.notify else 'Off'}")
-    if args.notify:
+    print(f"Uses notify send when time is over: {'On' if args.uses_notify_send else 'Off'}")
+    if args.notify and difference >= 0:
         from gi import require_version
         require_version('Notify', '0.7')
         from gi.repository import Notify
@@ -71,4 +77,13 @@ if __name__ == '__main__':
         )
         notification.set_timeout(0) # persist
         notification.show ()
+
+    if args.uses_notify_send and difference >= 0:
+        import os
+        title = f'Time to stop working (+{difference:.2f}h)'
+        os.system(
+            "notify-send \"" + title + "\" " + " \"" +
+            output_result + "\""
+        )
+    
 
