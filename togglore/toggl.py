@@ -65,6 +65,8 @@ class TogglClient(object):
         entry = None
         url = "https://www.toggl.com/api/v8/time_entries/current"
         response = self.request(url)
+        if response['data'] == None:
+            return None
         if (str(response['data']['wid']) == self.workspace and
            str(response['data']['uid']) == self.user_id and
            str(response['data']['pid']) == self.project):

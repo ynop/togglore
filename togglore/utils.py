@@ -11,6 +11,8 @@ def sum_time_of_entries(entries):
     return ms / 3600000.0
 
 def get_time_of_running_entry(entry):
+    if not entry:
+        return 0.0
     current_time = int(datetime.datetime.now().strftime("%s"))
     duration = int(entry['duration'])
     return (current_time + duration) / 3600.0

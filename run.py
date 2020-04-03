@@ -59,7 +59,7 @@ if __name__ == '__main__':
     print(output_result)
 
     print(f"Send notification when time is over: {'On' if args.notify else 'Off'}")
-    if args.notify and difference > 0:
+    if args.notify:
         from gi import require_version
         require_version('Notify', '0.7')
         from gi.repository import Notify
@@ -69,6 +69,6 @@ if __name__ == '__main__':
             ('-' * 112) + "\r\n" + output_result,
             "dialog-information"
         )
-        notification.set_timeout(0)
+        notification.set_timeout(0) # persist
         notification.show ()
 
