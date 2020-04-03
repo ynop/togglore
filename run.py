@@ -38,21 +38,22 @@ if __name__ == '__main__':
 
     expected = 0
     actual = 0
+    running = 0
 
     if args.command == 'range':
-        actual, expected = client.diff(utils.DateRange.parse_from_iso_strings(args.from_date, args.to_date))
+        actual, expected, running = client.diff(utils.DateRange.parse_from_iso_strings(args.from_date, args.to_date))
     elif args.command == 'thisyear':
-        actual, expected = client.diff(utils.DateRange.this_year(), include_running=True)
+        actual, expected, running = client.diff(utils.DateRange.this_year(), include_running=True)
     elif args.command == 'thismonth':
-        actual, expected = client.diff(utils.DateRange.this_month(), include_running=True)
+        actual, expected, running = client.diff(utils.DateRange.this_month(), include_running=True)
     elif args.command == 'thisweek':
-        actual, expected = client.diff(utils.DateRange.this_week(), include_running=True)
+        actual, expected, running = client.diff(utils.DateRange.this_week(), include_running=True)
     elif args.command == 'today':
-        actual, expected = client.diff(utils.DateRange.today(), include_running=True)
+        actual, expected, running = client.diff(utils.DateRange.today(), include_running=True)
     elif args.command == 'month':
-        actual, expected = client.diff(utils.DateRange.month(int(args.month)))
+        actual, expected, running = client.diff(utils.DateRange.month(int(args.month)))
     elif args.command == 'since':
-        actual, expected = client.diff(utils.DateRange.since(args.since))
+        actual, expected, running = client.diff(utils.DateRange.since(args.since))
 
 
     difference = actual-expected
@@ -65,7 +66,7 @@ if __name__ == '__main__':
 
     print(f"Send notification when time is over: {'On' if args.notify else 'Off'}")
     print(f"Uses notify send when time is over: {'On' if args.uses_notify_send else 'Off'}")
-    if args.notify and difference >= 0:
+    if args.notify and difference >= 0 and running:
         from gi import require_version
         require_version('Notify', '0.7')
         from gi.repository import Notify
@@ -78,7 +79,7 @@ if __name__ == '__main__':
         notification.set_timeout(0) # persist
         notification.show ()
 
-    if args.uses_notify_send and difference >= 0:
+    if args.uses_notify_send and difference >= 0 and running:
         import os
         title = f'Time to stop working (+{difference:.2f}h)'
         os.system(

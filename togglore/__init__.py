@@ -16,8 +16,8 @@ class Togglore(object):
     def diff(self, date_range, include_running=False):
         actual_hours = utils.sum_time_of_entries(self.toggle.time_entries(date_range))
         expected_hours = self.time_calculator.time_to_work_in_range(date_range)
+        running_time_entry_hours = utils.get_time_of_running_entry(self.toggle.running_time_entry())
         if include_running:
-            running_time_entry_hours = utils.get_time_of_running_entry(self.toggle.running_time_entry())
             actual_hours = actual_hours + running_time_entry_hours
 
-        return actual_hours, expected_hours
+        return actual_hours, expected_hours, running_time_entry_hours
