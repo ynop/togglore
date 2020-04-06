@@ -3,8 +3,9 @@ API_KEY = 5b9f5e3fd7745a022781daf205f62c72
 
 [Work Hours]
 hours_per_day = 8.4
-excluded_days = 2016.1.1,2016.12.30
+excluded_days = 2020.01.01,2020.01.30
 
 [User Info]
-id = 1
-workspace = 1
+id = 123123123
+workspace = 123123123
+project = 123123123

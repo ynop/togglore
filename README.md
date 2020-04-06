@@ -22,7 +22,7 @@ API_KEY = 5b9f5e3fd7745a022781daf205f62c72
 
 [Work Hours]
 hours_per_day = 8.4
-excluded_days = 2016.01.01
+excluded_days = 2020.01.01,2020.01.30
 
 [User Info]
 id = 123123123
