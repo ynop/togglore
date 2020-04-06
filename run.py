@@ -97,10 +97,28 @@ def main():
     difference_brl = difference_eur * brl
 
     output_result = (
-        ("Hours to do: {0:.2f}h ({1:.2f} days) -> €{2:.2f} - R${3:.2f}".format(expected, expected/client.cfg.work_hours_per_day, expected_eur, expected_brl)) + "\r\n" +
-        ("Hours worked: {0:.2f}h ({1:.2f} days) -> €{2:.2f} - R${3:.2f}".format(actual, actual/client.cfg.work_hours_per_day, actual_eur, actual_brl)) + "\r\n" +
-        ("Difference: {0:.2f}h ({1:.2f} days) -> €{2:.2f} - R${3:.2f}".format(difference, difference/client.cfg.work_hours_per_day, difference_eur, difference_brl)) + "\r\n" +
-        f"1 EUR <-> {brl:.3f} BRL on {brl_update_date}"
+        "Hours to do: {0:.2f}{1} ({2:.2f} days) -> €{3:.2f} | R${4:.2f}".format(
+            expected if expected >= 1 else expected * 60,
+            " h" if expected >= 1 else " min",
+            expected/client.cfg.work_hours_per_day,
+            expected_eur,
+            expected_brl
+        ) + "\r\n" +
+        "Hours worked: {0:.2f}{1} ({2:.2f} days) -> €{3:.2f} | R${4:.2f}".format(
+            actual if actual >= 1 else actual * 60,
+            " h" if actual >= 1 else " min",
+            actual/client.cfg.work_hours_per_day,
+            actual_eur,
+            actual_brl
+        ) + "\r\n" +
+        "Difference: {0:.2f}{1} ({2:.2f} days) -> €{3:.2f} | R${4:.2f}".format(
+            difference if difference >= 1 else difference * 60,
+            " h" if difference >= 1 else " min",
+            difference/client.cfg.work_hours_per_day,
+            abs(difference_eur),
+            abs(difference_brl)
+        ) + "\r\n" +
+        f"1 EUR <--> {brl:.3f} BRL on {brl_update_date}"
     )
     print("*"*60)
     print(output_result)
