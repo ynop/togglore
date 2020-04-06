@@ -71,6 +71,14 @@ class DateRange(object):
         return cls(start, end)
 
     @classmethod
+    def this_week_until_today(cls):
+        today = datetime.date.today()
+        start = today - datetime.timedelta(today.weekday())
+        end = today
+
+        return cls(start, end)
+
+    @classmethod
     def this_month(cls):
         today = datetime.date.today()
         __, end_day = calendar.monthrange(today.year, today.month)
@@ -80,10 +88,27 @@ class DateRange(object):
         return cls(start, end)
 
     @classmethod
+    def this_month_until_today(cls):
+        today = datetime.date.today()
+        __, end_day = calendar.monthrange(today.year, today.month)
+        start = datetime.date(today.year, today.month, 1)
+        end = today
+
+        return cls(start, end)
+
+    @classmethod
     def this_year(cls):
         today = datetime.date.today()
         start = datetime.date(today.year, 1, 1)
         end = datetime.date(today.year, 12, 31)
+
+        return cls(start, end)
+
+    @classmethod
+    def this_year_until_today(cls):
+        today = datetime.date.today()
+        start = datetime.date(today.year, 1, 1)
+        end = today
 
         return cls(start, end)
 

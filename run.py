@@ -23,6 +23,11 @@ if __name__ == '__main__':
     parser_since.add_argument('since', help='since e.g. 2016.08.01')
 
     parser.add_argument(
+        '--untiltoday',
+        action="store_true",
+    )
+
+    parser.add_argument(
         '--notify',
         action="store_true",
     )
@@ -43,10 +48,19 @@ if __name__ == '__main__':
     if args.command == 'range':
         actual, expected, running = client.diff(utils.DateRange.parse_from_iso_strings(args.from_date, args.to_date))
     elif args.command == 'thisyear':
+        if args.untiltoday:
+            actual, expected, running = client.diff(utils.DateRange.this_year_until_today(), include_running=True)
+        else:
         actual, expected, running = client.diff(utils.DateRange.this_year(), include_running=True)
     elif args.command == 'thismonth':
+        if args.untiltoday:
+            actual, expected, running = client.diff(utils.DateRange.this_month_until_today(), include_running=True)
+        else:
         actual, expected, running = client.diff(utils.DateRange.this_month(), include_running=True)
     elif args.command == 'thisweek':
+        if args.untiltoday:
+            actual, expected, running = client.diff(utils.DateRange.this_week_until_today(), include_running=True)
+        else:
         actual, expected, running = client.diff(utils.DateRange.this_week(), include_running=True)
     elif args.command == 'today':
         actual, expected, running = client.diff(utils.DateRange.today(), include_running=True)
