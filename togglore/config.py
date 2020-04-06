@@ -1,6 +1,6 @@
 import configparser
 import datetime
-
+import requests
 
 class Config(object):
     def __init__(self, api_key=None, work_hours_per_day=8.4, excluded_days=[], user_id=1, workspace=1, project=1, boss_name="Boss", hourly_wage=10.0, eur_to_brl={'value': '5.0', 'date': '30/01/2020'}):
@@ -22,6 +22,22 @@ class Config(object):
 
         with open(path, 'w') as configfile:
             cfg.write(configfile)
+    
+    def update_eur_value(self, path):
+        cfg = configparser.ConfigParser()
+        cfg.read(path)
+
+        url = "https://api.exchangerate-api.com/v6/latest"
+        response = requests.get(url)
+        if response.status_code == 200:
+            result = response.json()
+            cfg['EUR to BRL']['value'] = str(result['rates']['BRL'] / result['rates']['EUR'])
+            cfg['EUR to BRL']['date'] = str(datetime.datetime.fromtimestamp(result['time_last_update_unix']).strftime("%d/%m/%Y %H:%M"))
+            self.eur_to_brl = cfg['EUR to BRL']
+
+            with open(path, 'w') as configfile:
+                cfg.write(configfile)
+            
 
     @classmethod
     def read_from_file(cls, path):

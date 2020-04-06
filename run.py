@@ -4,7 +4,7 @@ import togglore
 from togglore import utils
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Tool for toggle to calculate over/undertime.')
     subparsers = parser.add_subparsers(dest='command')
     subparsers.required = True
@@ -12,6 +12,8 @@ if __name__ == '__main__':
     parser_range = subparsers.add_parser('range', help='range help')
     parser_range.add_argument('from_date', help='startdate, e.g. 30.08.2016')
     parser_range.add_argument('to_date', help='enddate, e.g. 12.10.2016')
+
+    parser_updatecotation = subparsers.add_parser('updatecotation', help='updatecotation help')
 
     parser_year = subparsers.add_parser('thisyear', help='today help')
     parser_thismonth = subparsers.add_parser('thismonth', help='month help')
@@ -46,6 +48,13 @@ if __name__ == '__main__':
     expected = 0
     actual = 0
     running = 0
+
+    if args.command == 'updatecotation':
+        client.cfg.update_eur_value(client.config_path)
+        brl = float(client.cfg.eur_to_brl['value'])
+        brl_update_date = client.cfg.eur_to_brl['date']
+        print(f"* EUR value updated to {brl:.3f} BRL on {brl_update_date}")
+        return
 
     if args.command == 'range':
         actual, expected, running = client.diff(utils.DateRange.parse_from_iso_strings(args.from_date, args.to_date))
@@ -91,7 +100,7 @@ if __name__ == '__main__':
         ("Hours to do: {0:.2f}h ({1:.2f} days) -> €{2:.2f} - R${3:.2f}".format(expected, expected/client.cfg.work_hours_per_day, expected_eur, expected_brl)) + "\r\n" +
         ("Hours worked: {0:.2f}h ({1:.2f} days) -> €{2:.2f} - R${3:.2f}".format(actual, actual/client.cfg.work_hours_per_day, actual_eur, actual_brl)) + "\r\n" +
         ("Difference: {0:.2f}h ({1:.2f} days) -> €{2:.2f} - R${3:.2f}".format(difference, difference/client.cfg.work_hours_per_day, difference_eur, difference_brl)) + "\r\n" +
-        f"1 EUR <-> {brl:.4f} BRL on {brl_update_date}"
+        f"1 EUR <-> {brl:.3f} BRL on {brl_update_date}"
     )
     print("*"*60)
     print(output_result)
@@ -139,3 +148,5 @@ if __name__ == '__main__':
         )
     
 
+if __name__ == '__main__':
+    main()
