@@ -140,20 +140,39 @@ def main():
         print(email_message)
         print("*"*80)
     elif args.command == 'lastweek':
+        expected_end_of_month = client.time_calculator.time_to_work_in_range(
+            utils.DateRange.this_month()
+        )
+        date_range = utils.DateRange.last_week()
+        actual_hours = int(actual)
+        actual_minutes_float = (actual - actual_hours) * 60
+        actual_minutes = int(actual_minutes_float)
+        actual_seconds = int((actual_minutes_float - actual_minutes) * 60)
+        # Email template
         email_message = (
             f"Bonjour {client.cfg.boss_name}," + "\n" +
-            "Je vous envoie le total du mois de <month>." + "\n" +
-            "Prévu pour le mois:  {0:.2f}h ({1:.2f} jours)".format(expected, expected/client.cfg.work_hours_per_day) + "\n" +
-            "Total pour le mois:  {0:.2f}h ({1:.2f} jours)".format(actual, actual/client.cfg.work_hours_per_day) + "\n" +
-            "Total:  {0:.2f} hrs x {1:.1f} = €{2:.2f}".format(actual, client.cfg.hourly_wage, actual * client.cfg.hourly_wage) + "\n" +
-            "\n" +
-            "Quel jour de cette semaine vous pouvez fair le virement?" + "\n" +
-            "Dans le même jour je vais générer le document fiscale en considerant de la cotation du jour forni par transferwise." + "\n" +
-            "\n" +
-            "Je vous souhaite une bonne journée."
+            "Pour info je vous envoie la quantité des heures que j'ai fait la dernière semaine." + "\n\n" +
+            "Total (Semaine) : {}:{}:{} ({:.2f} hrs)".format(
+                actual_hours,
+                actual_minutes,
+                actual_seconds,
+                actual,
+            ) + "\n" +
+            "Balance (Semaine) : {}:{} ({:.2f} hrs)".format(
+                int(difference),
+                int((difference - int(difference)) * 60),
+                difference,
+            ) + "\n" +
+            "Total prévu pour le mois : {0:.2f}h ({1:.0f} jours)".format(
+                expected_end_of_month, expected_end_of_month/client.cfg.work_hours_per_day
+            ) + "\n\n" +
+            "Cordialement,\nItalo Gustavo Sampaio Fernandes"
         )
         print("*"*80)
-        print("Rapport des heures - <month>")
+        print("Rapport des heures - Semaine {start} à {end}".format(
+            start=date_range.start.strftime("%d/%m"),
+            end=date_range.end.strftime("%d/%m")
+        ))
         print("*"*40)
         print(email_message)
         print("*"*80)
