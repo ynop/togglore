@@ -15,7 +15,9 @@ if __name__ == '__main__':
 
     parser_year = subparsers.add_parser('thisyear', help='today help')
     parser_thismonth = subparsers.add_parser('thismonth', help='month help')
+    parser_lastmonth = subparsers.add_parser('lastmonth', help='last month help')
     parser_week = subparsers.add_parser('thisweek', help='week help')
+    parser_lastweek = subparsers.add_parser('lastweek', help='this week help')
     parser_today = subparsers.add_parser('today', help='day help')
     parser_month = subparsers.add_parser('month', help='month help')
     parser_month.add_argument('month', help='month e.g. 08')
@@ -57,11 +59,15 @@ if __name__ == '__main__':
             actual, expected, running = client.diff(utils.DateRange.this_month_until_today(), include_running=True)
         else:
             actual, expected, running = client.diff(utils.DateRange.this_month(), include_running=True)
+    elif args.command == 'lastmonth':
+            actual, expected, running = client.diff(utils.DateRange.last_month(), include_running=True)
     elif args.command == 'thisweek':
         if args.untiltoday:
             actual, expected, running = client.diff(utils.DateRange.this_week_until_today(), include_running=True)
         else:
             actual, expected, running = client.diff(utils.DateRange.this_week(), include_running=True)
+    elif args.command == 'lastweek':
+        actual, expected, running = client.diff(utils.DateRange.last_week(), include_running=True)
     elif args.command == 'today':
         actual, expected, running = client.diff(utils.DateRange.today(), include_running=True)
     elif args.command == 'month':

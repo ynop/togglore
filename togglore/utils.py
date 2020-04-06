@@ -69,6 +69,14 @@ class DateRange(object):
         end = start + datetime.timedelta(6)
 
         return cls(start, end)
+    
+    @classmethod
+    def last_week(cls):
+        today = datetime.date.today()
+        end = today - datetime.timedelta(today.weekday()) - datetime.timedelta(1)
+        start = end - datetime.timedelta(6)
+
+        return cls(start, end)
 
     @classmethod
     def this_week_until_today(cls):
@@ -84,6 +92,20 @@ class DateRange(object):
         __, end_day = calendar.monthrange(today.year, today.month)
         start = datetime.date(today.year, today.month, 1)
         end = datetime.date(today.year, today.month, end_day)
+
+        return cls(start, end)
+    
+    @classmethod
+    def last_month(cls):
+        today = datetime.date.today()
+        month = today.month - 1
+        year = today.year
+        if month == 0:
+            month = 12
+            year = year - 1
+        __, end_day = calendar.monthrange(year, month)
+        start = datetime.date(year, month, 1)
+        end = datetime.date(year, month, end_day)
 
         return cls(start, end)
 
