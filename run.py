@@ -77,14 +77,25 @@ if __name__ == '__main__':
 
 
     difference = actual-expected
+
+    brl = float(client.cfg.eur_to_brl['value'])
+    brl_update_date = client.cfg.eur_to_brl['date']
+    actual_eur = actual * client.cfg.hourly_wage
+    actual_brl = actual_eur * brl
+    expected_eur = expected * client.cfg.hourly_wage
+    expected_brl = expected_eur * brl
+    difference_eur = difference * client.cfg.hourly_wage
+    difference_brl = difference_eur * brl
+
     output_result = (
-        ("Hours to do: {0:.2f}h ({1:.2f} days)".format(expected, expected/client.cfg.work_hours_per_day)) + "\r\n" +
-        ("Hours worked: {0:.2f}h ({1:.2f} days)".format(actual, actual/client.cfg.work_hours_per_day)) + "\r\n" +
-        ("Difference: {0:.2f}h ({1:.2f} days)".format(difference, difference/client.cfg.work_hours_per_day))
+        ("Hours to do: {0:.2f}h ({1:.2f} days) -> €{2:.2f} - R${3:.2f}".format(expected, expected/client.cfg.work_hours_per_day, expected_eur, expected_brl)) + "\r\n" +
+        ("Hours worked: {0:.2f}h ({1:.2f} days) -> €{2:.2f} - R${3:.2f}".format(actual, actual/client.cfg.work_hours_per_day, actual_eur, actual_brl)) + "\r\n" +
+        ("Difference: {0:.2f}h ({1:.2f} days) -> €{2:.2f} - R${3:.2f}".format(difference, difference/client.cfg.work_hours_per_day, difference_eur, difference_brl)) + "\r\n" +
+        f"1€ = R${brl} on {brl_update_date}"
     )
-    print("*"*40)
+    print("*"*60)
     print(output_result)
-    print("*"*40)
+    print("*"*60)
 
     if args.command == 'lastmonth':
         email_message = (
