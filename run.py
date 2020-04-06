@@ -86,6 +86,25 @@ if __name__ == '__main__':
     print(output_result)
     print("*"*40)
 
+    if args.command == 'lastmonth':
+        email_message = (
+            f"Bonjour {client.cfg.boss_name}," + "\n" +
+            "Je vous envoie le total du mois de <month>." + "\n" +
+            "Prévu pour le mois:  {0:.2f}h ({1:.2f} jours)".format(expected, expected/client.cfg.work_hours_per_day) + "\n" +
+            "Total pour le mois:  {0:.2f}h ({1:.2f} jours)".format(actual, actual/client.cfg.work_hours_per_day) + "\n" +
+            "Total:  {0:.2f} hrs x {1:.1f} = €{2:.2f}".format(actual, client.cfg.hourly_wage, actual * client.cfg.hourly_wage) + "\n" +
+            "\n" +
+            "Quel jour de cette semaine vous pouvez fair le virement?" + "\n" +
+            "Dans le même jour je vais générer le document fiscale en considerant de la cotation du jour forni par transferwise." + "\n" +
+            "\n" +
+            "Je vous souhaite une bonne journée."
+        )
+        print("*"*80)
+        print("Rapport des heures - <month>")
+        print("*"*40)
+        print(email_message)
+        print("*"*80)
+
     print(f"Running time entry: {'Yes' if running else 'No'}")
     if args.notify and difference >= 0 and running:
         from gi import require_version
