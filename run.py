@@ -150,7 +150,10 @@ def main():
         from gi.repository import Notify
         Notify.init("Toggle Notifier")
         notification=Notify.Notification.new(
-            f'Time to stop working (+{difference:.2f}h)',
+            'Time to stop working (+{0:.2f}{1})'.format(
+                difference if difference >= 1 else difference * 60,
+                " h" if difference >= 1 else " min",
+            ),
             ('-' * 112) + "\r\n" + output_result,
             "dialog-information"
         )
@@ -160,7 +163,10 @@ def main():
 
     if args.uses_notify_send and difference >= 0 and running:
         import os
-        title = f'Time to stop working (+{difference:.2f}h)'
+        title = 'Time to stop working (+{0:.2f}{1})'.format(
+                difference if difference >= 1 else difference * 60,
+                " h" if difference >= 1 else " min",
+        )
         os.system(
             "notify-send \"" + title + "\" " + " \"" +
             output_result + "\""
