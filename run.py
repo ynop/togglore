@@ -60,14 +60,14 @@ if __name__ == '__main__':
         else:
             actual, expected, running = client.diff(utils.DateRange.this_month(), include_running=True)
     elif args.command == 'lastmonth':
-            actual, expected, running = client.diff(utils.DateRange.last_month(), include_running=True)
+            actual, expected, running = client.diff(utils.DateRange.last_month())
     elif args.command == 'thisweek':
         if args.untiltoday:
             actual, expected, running = client.diff(utils.DateRange.this_week_until_today(), include_running=True)
         else:
             actual, expected, running = client.diff(utils.DateRange.this_week(), include_running=True)
     elif args.command == 'lastweek':
-        actual, expected, running = client.diff(utils.DateRange.last_week(), include_running=True)
+        actual, expected, running = client.diff(utils.DateRange.last_week())
     elif args.command == 'today':
         actual, expected, running = client.diff(utils.DateRange.today(), include_running=True)
     elif args.command == 'month':
