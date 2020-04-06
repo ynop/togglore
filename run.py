@@ -120,9 +120,6 @@ def main():
         ) + "\r\n" +
         f"1 EUR <--> {brl:.3f} BRL on {brl_update_date}"
     )
-    print("*"*60)
-    print(output_result)
-    print("*"*60)
 
     if args.command == 'lastmonth':
         email_message = (
@@ -142,6 +139,50 @@ def main():
         print("*"*40)
         print(email_message)
         print("*"*80)
+    elif args.command == 'lastweek':
+        email_message = (
+            f"Bonjour {client.cfg.boss_name}," + "\n" +
+            "Je vous envoie le total du mois de <month>." + "\n" +
+            "Prévu pour le mois:  {0:.2f}h ({1:.2f} jours)".format(expected, expected/client.cfg.work_hours_per_day) + "\n" +
+            "Total pour le mois:  {0:.2f}h ({1:.2f} jours)".format(actual, actual/client.cfg.work_hours_per_day) + "\n" +
+            "Total:  {0:.2f} hrs x {1:.1f} = €{2:.2f}".format(actual, client.cfg.hourly_wage, actual * client.cfg.hourly_wage) + "\n" +
+            "\n" +
+            "Quel jour de cette semaine vous pouvez fair le virement?" + "\n" +
+            "Dans le même jour je vais générer le document fiscale en considerant de la cotation du jour forni par transferwise." + "\n" +
+            "\n" +
+            "Je vous souhaite une bonne journée."
+        )
+        print("*"*80)
+        print("Rapport des heures - <month>")
+        print("*"*40)
+        print(email_message)
+        print("*"*80)
+    elif args.command == 'thismonth':
+        expected_end_of_month = client.time_calculator.time_to_work_in_range(
+            utils.DateRange.this_month()
+        )
+        output_result = output_result + (
+            "\r\n" +
+            "End of the month: {0:.2f} hrs x {1:.1f}€ = €{2:.2f} | R${3:.2f}".format(
+                expected_end_of_month,
+                client.cfg.hourly_wage,
+                expected_end_of_month * client.cfg.hourly_wage,
+                expected_end_of_month * client.cfg.hourly_wage * brl,
+            )
+        )
+        if args.untiltoday:
+            actual_today, expected_today, running_today = client.diff(utils.DateRange.today(), include_running=True)
+            output_result = output_result + (
+                "\r\n" +
+                "Today: {0:.2f}{1}".format(
+                    actual_today if actual_today >= 1 else actual_today * 60,
+                    " h" if actual_today >= 1 else " min",
+                )
+            )
+
+    print("*"*60)
+    print(output_result)
+    print("*"*60)
 
     print(f"Running time entry: {'Yes' if running else 'No'}")
     if args.notify and difference >= 0 and running:
