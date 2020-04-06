@@ -136,7 +136,8 @@ def main():
             ('-' * 112) + "\r\n" + output_result,
             "dialog-information"
         )
-        notification.set_timeout(0) # persist
+        notification.set_timeout(Notify.EXPIRES_NEVER)  # persist
+        notification.set_urgency(Notify.Urgency.CRITICAL)  # persist
         notification.show ()
 
     if args.uses_notify_send and difference >= 0 and running:
