@@ -51,17 +51,17 @@ if __name__ == '__main__':
         if args.untiltoday:
             actual, expected, running = client.diff(utils.DateRange.this_year_until_today(), include_running=True)
         else:
-        actual, expected, running = client.diff(utils.DateRange.this_year(), include_running=True)
+            actual, expected, running = client.diff(utils.DateRange.this_year(), include_running=True)
     elif args.command == 'thismonth':
         if args.untiltoday:
             actual, expected, running = client.diff(utils.DateRange.this_month_until_today(), include_running=True)
         else:
-        actual, expected, running = client.diff(utils.DateRange.this_month(), include_running=True)
+            actual, expected, running = client.diff(utils.DateRange.this_month(), include_running=True)
     elif args.command == 'thisweek':
         if args.untiltoday:
             actual, expected, running = client.diff(utils.DateRange.this_week_until_today(), include_running=True)
         else:
-        actual, expected, running = client.diff(utils.DateRange.this_week(), include_running=True)
+            actual, expected, running = client.diff(utils.DateRange.this_week(), include_running=True)
     elif args.command == 'today':
         actual, expected, running = client.diff(utils.DateRange.today(), include_running=True)
     elif args.command == 'month':
@@ -76,11 +76,11 @@ if __name__ == '__main__':
         ("Hours worked: {0:.2f}h ({1:.2f} days)".format(actual, actual/client.cfg.work_hours_per_day)) + "\r\n" +
         ("Difference: {0:.2f}h ({1:.2f} days)".format(difference, difference/client.cfg.work_hours_per_day))
     )
+    print("*"*40)
     print(output_result)
+    print("*"*40)
 
-    print(f"Running: {'Yes' if running else 'No'}")
-    print(f"Send notification when time is over: {'On' if args.notify else 'Off'}")
-    print(f"Uses notify send when time is over: {'On' if args.uses_notify_send else 'Off'}")
+    print(f"Running time entry: {'Yes' if running else 'No'}")
     if args.notify and difference >= 0 and running:
         from gi import require_version
         require_version('Notify', '0.7')
