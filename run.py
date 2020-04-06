@@ -91,7 +91,7 @@ if __name__ == '__main__':
         ("Hours to do: {0:.2f}h ({1:.2f} days) -> €{2:.2f} - R${3:.2f}".format(expected, expected/client.cfg.work_hours_per_day, expected_eur, expected_brl)) + "\r\n" +
         ("Hours worked: {0:.2f}h ({1:.2f} days) -> €{2:.2f} - R${3:.2f}".format(actual, actual/client.cfg.work_hours_per_day, actual_eur, actual_brl)) + "\r\n" +
         ("Difference: {0:.2f}h ({1:.2f} days) -> €{2:.2f} - R${3:.2f}".format(difference, difference/client.cfg.work_hours_per_day, difference_eur, difference_brl)) + "\r\n" +
-        f"1€ = R${brl} on {brl_update_date}"
+        f"1 EUR <-> {brl:.4f} BRL on {brl_update_date}"
     )
     print("*"*60)
     print(output_result)
