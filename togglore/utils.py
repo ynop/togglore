@@ -65,7 +65,7 @@ class DateRange(object):
     @classmethod
     def this_week(cls):
         today = datetime.date.today()
-        start = today - datetime.timedelta(today.weekday())
+        start = today - datetime.timedelta(today.weekday() + 1)
         end = start + datetime.timedelta(6)
 
         return cls(start, end)
@@ -73,7 +73,7 @@ class DateRange(object):
     @classmethod
     def last_week(cls):
         today = datetime.date.today()
-        end = today - datetime.timedelta(today.weekday()) - datetime.timedelta(1)
+        end = today - datetime.timedelta(today.weekday() + 1) - datetime.timedelta(1)
         start = end - datetime.timedelta(6)
 
         return cls(start, end)
