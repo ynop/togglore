@@ -112,7 +112,7 @@ def main():
             actual_eur,
             actual_brl
         ) + "\r\n" +
-        "Difference:\t{0:5.2f}{1} ({2:.2f} days) -> €{3:6.2f} | R$ {4:4.0f}".format(
+        "Difference:\t{0:5.2f}{1} ({2:5.2f} days) -> €{3:6.2f} | R$ {4:4.0f}".format(
             difference if abs(difference) >= 1 else difference * 60,
             " h" if abs(difference) >= 1 else " min",
             difference/client.cfg.work_hours_per_day,
