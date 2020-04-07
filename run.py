@@ -198,6 +198,20 @@ def main():
                     " h" if abs(actual_today) >= 1 else " min",
                 )
             )
+    elif args.command == 'today':
+        expected_end_of_month = client.time_calculator.time_to_work_in_range(
+            utils.DateRange.this_month()
+        )
+        output_result = output_result + (
+            "\r\n" +
+            "End of the month: {0:.2f} hrs x {1:.1f}€ = €{2:.2f} | R${3:.2f}".format(
+                expected_end_of_month,
+                client.cfg.hourly_wage,
+                expected_end_of_month * client.cfg.hourly_wage,
+                expected_end_of_month * client.cfg.hourly_wage * brl,
+            )
+        )
+
 
     print("*"*60)
     print(output_result)
