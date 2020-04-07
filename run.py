@@ -153,7 +153,7 @@ def main():
         # Email template
         email_message = (
             f"Bonjour {client.cfg.boss_name}," + "\n" +
-            "Pour info je vous envoie la quantité des heures que j'ai fait la dernière semaine." + "\n\n" +
+            "Pour info je vous envoie la quantité des heures que j'ai fait la semaine dernière." + "\n\n" +
             "Total (Semaine) : {}:{}:{} ({:.2f} hrs)".format(
                 actual_hours,
                 actual_minutes,
