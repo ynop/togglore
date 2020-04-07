@@ -1,4 +1,5 @@
 import argparse
+import datetime
 
 import togglore
 from togglore import utils
@@ -97,28 +98,29 @@ def main():
     difference_brl = difference_eur * brl
 
     output_result = (
-        "Hours to do: {0:.2f}{1} ({2:.2f} days) -> €{3:.2f} | R${4:.2f}".format(
+        "Hours to do:\t{0:5.2f}{1} ({2:5.2f} days) -> €{3:6.2f} | R$ {4:4.0f}".format(
             expected if abs(expected) >= 1 else expected * 60,
             " h" if abs(expected) >= 1 else " min",
             expected/client.cfg.work_hours_per_day,
             expected_eur,
             expected_brl
         ) + "\r\n" +
-        "Hours worked: {0:.2f}{1} ({2:.2f} days) -> €{3:.2f} | R${4:.2f}".format(
+        "Hours worked:\t{0:5.2f}{1} ({2:5.2f} days) -> €{3:6.2f} | R$ {4:4.0f}".format(
             actual if abs(actual) >= 1 else actual * 60,
             " h" if abs(actual) >= 1 else " min",
             actual/client.cfg.work_hours_per_day,
             actual_eur,
             actual_brl
         ) + "\r\n" +
-        "Difference: {0:.2f}{1} ({2:.2f} days) -> €{3:.2f} | R${4:.2f}".format(
+        "Difference:\t{0:5.2f}{1} ({2:.2f} days) -> €{3:6.2f} | R$ {4:4.0f}".format(
             difference if abs(difference) >= 1 else difference * 60,
             " h" if abs(difference) >= 1 else " min",
             difference/client.cfg.work_hours_per_day,
             abs(difference_eur),
             abs(difference_brl)
         ) + "\r\n" +
-        f"1 EUR <--> {brl:.3f} BRL on {brl_update_date}"
+        "-" * 60 + "\r\n" +
+        f"Cotation on {brl_update_date}: 1 EUR = {brl:.3f} BRL"
     )
 
     if args.command == 'lastmonth':
@@ -182,9 +184,10 @@ def main():
         )
         output_result = output_result + (
             "\r\n" +
-            "End of the month: {0:.2f} hrs x {1:.1f}€ = €{2:.2f} | R${3:.2f}".format(
+            "Total: {0:.2f} hrs x {1:.1f}€ (R$ {2:.1f}) = €{3:.2f} | R$ {4:.0f}".format(
                 expected_end_of_month,
                 client.cfg.hourly_wage,
+                client.cfg.hourly_wage * brl,
                 expected_end_of_month * client.cfg.hourly_wage,
                 expected_end_of_month * client.cfg.hourly_wage * brl,
             )
@@ -193,10 +196,22 @@ def main():
             actual_today, expected_today, running_today = client.diff(utils.DateRange.today(), include_running=True)
             output_result = output_result + (
                 "\r\n" +
-                "Today: {0:.2f}{1}".format(
-                    actual_today if abs(actual_today) >= 1 else actual_today * 60,
-                    " h" if abs(actual_today) >= 1 else " min",
+                "-" * 60 + "\r\n"
+            )
+            if difference <= 0:
+                finish_prevision = (
+                    datetime.datetime.now() +
+                    datetime.timedelta(hours=-difference)
+                ).strftime("%H:%M")
+                output_result = output_result + (
+                    f"Finish prevision ({-difference:.2f}h): {finish_prevision}" + "\r\n" +
+                    "-" * 60 + "\r\n"
                 )
+            output_result = output_result + (
+                "Today: " + f"{actual_today:.2f}h / {expected-actual+actual_today:.2f}h" + "\r\n" +
+                "{0:3.0f}%".format(100*actual/expected) + " " + "[" + "=" * int(actual*54/expected) + "-" * int(-(difference)*54/expected) + "]" + "\r\n" +
+                "This Month: " + f"{actual/client.cfg.work_hours_per_day:.2f} / {(expected_end_of_month/client.cfg.work_hours_per_day):.0f} days        -       " + f"R$ {actual_brl:.0f} / R$ {(expected_end_of_month * client.cfg.hourly_wage * brl):.0f}" + "\r\n" +
+                "{0:3.0f}%".format(100*actual/expected_end_of_month) + " " + "[" + "=" * int(actual*54/expected_end_of_month) + "-" * int(-(actual-expected_end_of_month)*54/expected_end_of_month) + "]"
             )
     elif args.command == 'today':
         expected_end_of_month = client.time_calculator.time_to_work_in_range(
@@ -204,12 +219,30 @@ def main():
         )
         output_result = output_result + (
             "\r\n" +
-            "End of the month: {0:.2f} hrs x {1:.1f}€ = €{2:.2f} | R${3:.2f}".format(
+            "Total: {0:.2f} hrs x {1:.1f}€ (R$ {2:.1f}) = €{3:.2f} | R$ {4:.0f}".format(
                 expected_end_of_month,
                 client.cfg.hourly_wage,
+                client.cfg.hourly_wage * brl,
                 expected_end_of_month * client.cfg.hourly_wage,
                 expected_end_of_month * client.cfg.hourly_wage * brl,
             )
+        )
+        output_result = output_result + (
+            "\r\n" +
+            "-" * 60 + "\r\n"
+        )
+        if difference <= 0:
+            finish_prevision = (
+                datetime.datetime.now() +
+                datetime.timedelta(hours=-difference)
+            ).strftime("%H:%M")
+            output_result = output_result + (
+                f"Finish prevision ({-difference:.2f}h): {finish_prevision}" + "\r\n" +
+                "-" * 60 + "\r\n"
+            )
+        output_result=output_result + (
+            "Today: " + f"{actual:.2f}h / {expected:.2f}h" + "\r\n" +
+            "{0:3.0f}%".format(100*actual/expected) + " " + "[" + "=" * int(actual*54/expected) + "-" * int(-difference*54/expected) + "]"
         )
 
 
@@ -217,7 +250,7 @@ def main():
     print(output_result)
     print("*"*60)
 
-    print(f"Running time entry: {'Yes' if running else 'No'}")
+    print(f"Working now: {'Yes' if running else 'No'}")
     if args.notify and difference >= 0 and running:
         from gi import require_version
         require_version('Notify', '0.7')
