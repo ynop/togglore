@@ -209,7 +209,7 @@ def main():
                 )
             output_result = output_result + (
                 "Today: " + f"{actual_today:.2f}h / {expected-actual+actual_today:.2f}h" + "\r\n" +
-                "{0:3.0f}%".format(100*actual/expected) + " " + "[" + "=" * int(actual*54/expected) + "-" * int(-(difference)*54/expected) + "]" + "\r\n" +
+                "{0:3.0f}%".format(100*actual_today/(expected-actual+actual_today)) + " " + "[" + "=" * int(actual_today*54/(expected-actual+actual_today)) + "-" * int(-(difference)*54/(expected-actual+actual_today)) + "]" + "\r\n" +
                 "This Month: " + f"{actual/client.cfg.work_hours_per_day:.2f} / {(expected_end_of_month/client.cfg.work_hours_per_day):.0f} days        -       " + f"R$ {actual_brl:.0f} / R$ {(expected_end_of_month * client.cfg.hourly_wage * brl):.0f}" + "\r\n" +
                 "{0:3.0f}%".format(100*actual/expected_end_of_month) + " " + "[" + "=" * int(actual*54/expected_end_of_month) + "-" * int(-(actual-expected_end_of_month)*54/expected_end_of_month) + "]"
             )
