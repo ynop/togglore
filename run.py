@@ -98,22 +98,22 @@ def main():
 
     output_result = (
         "Hours to do: {0:.2f}{1} ({2:.2f} days) -> €{3:.2f} | R${4:.2f}".format(
-            expected if expected >= 1 else expected * 60,
-            " h" if expected >= 1 else " min",
+            expected if abs(expected) >= 1 else expected * 60,
+            " h" if abs(expected) >= 1 else " min",
             expected/client.cfg.work_hours_per_day,
             expected_eur,
             expected_brl
         ) + "\r\n" +
         "Hours worked: {0:.2f}{1} ({2:.2f} days) -> €{3:.2f} | R${4:.2f}".format(
-            actual if actual >= 1 else actual * 60,
-            " h" if actual >= 1 else " min",
+            actual if abs(actual) >= 1 else actual * 60,
+            " h" if abs(actual) >= 1 else " min",
             actual/client.cfg.work_hours_per_day,
             actual_eur,
             actual_brl
         ) + "\r\n" +
         "Difference: {0:.2f}{1} ({2:.2f} days) -> €{3:.2f} | R${4:.2f}".format(
-            difference if difference >= 1 else difference * 60,
-            " h" if difference >= 1 else " min",
+            difference if abs(difference) >= 1 else difference * 60,
+            " h" if abs(difference) >= 1 else " min",
             difference/client.cfg.work_hours_per_day,
             abs(difference_eur),
             abs(difference_brl)
@@ -194,8 +194,8 @@ def main():
             output_result = output_result + (
                 "\r\n" +
                 "Today: {0:.2f}{1}".format(
-                    actual_today if actual_today >= 1 else actual_today * 60,
-                    " h" if actual_today >= 1 else " min",
+                    actual_today if abs(actual_today) >= 1 else actual_today * 60,
+                    " h" if abs(actual_today) >= 1 else " min",
                 )
             )
 
@@ -211,8 +211,8 @@ def main():
         Notify.init("Toggle Notifier")
         notification=Notify.Notification.new(
             'Time to stop working (+{0:.2f}{1})'.format(
-                difference if difference >= 1 else difference * 60,
-                " h" if difference >= 1 else " min",
+                difference if abs(difference) >= 1 else difference * 60,
+                " h" if abs(difference) >= 1 else " min",
             ),
             ('-' * 112) + "\r\n" + output_result,
             "dialog-information"
@@ -224,8 +224,8 @@ def main():
     if args.uses_notify_send and difference >= 0 and running:
         import os
         title = 'Time to stop working (+{0:.2f}{1})'.format(
-                difference if difference >= 1 else difference * 60,
-                " h" if difference >= 1 else " min",
+                difference if abs(difference) >= 1 else difference * 60,
+                " h" if abs(difference) >= 1 else " min",
         )
         os.system(
             "notify-send \"" + title + "\" " + " \"" +
