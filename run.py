@@ -100,21 +100,21 @@ def main():
     output_result = (
         "Hours to do:\t{0:6.2f}{1} ({2:5.2f} days) -> €{3:7.2f} | R$ {4:4.0f}".format(
             expected if abs(expected) >= 1 else expected * 60,
-            " h" if abs(expected) >= 1 else " min",
+            " h" if abs(expected) >= 1 else " m",
             expected/client.cfg.work_hours_per_day,
             expected_eur,
             expected_brl
         ) + "\r\n" +
         "Hours worked:\t{0:6.2f}{1} ({2:5.2f} days) -> €{3:7.2f} | R$ {4:4.0f}".format(
             actual if abs(actual) >= 1 else actual * 60,
-            " h" if abs(actual) >= 1 else " min",
+            " h" if abs(actual) >= 1 else " m",
             actual/client.cfg.work_hours_per_day,
             actual_eur,
             actual_brl
         ) + "\r\n" +
         "Difference:\t{0:6.2f}{1} ({2:5.2f} days) -> €{3:7.2f} | R$ {4:4.0f}".format(
             difference if abs(difference) >= 1 else difference * 60,
-            " h" if abs(difference) >= 1 else " min",
+            " h" if abs(difference) >= 1 else " m",
             difference/client.cfg.work_hours_per_day,
             abs(difference_eur),
             abs(difference_brl)
@@ -259,7 +259,7 @@ def main():
         notification=Notify.Notification.new(
             'Time to stop working (+{0:.2f}{1})'.format(
                 difference if abs(difference) >= 1 else difference * 60,
-                " h" if abs(difference) >= 1 else " min",
+                " h" if abs(difference) >= 1 else " m",
             ),
             ('-' * 112) + "\r\n" + output_result,
             "dialog-information"
@@ -272,7 +272,7 @@ def main():
         import os
         title = 'Time to stop working (+{0:.2f}{1})'.format(
                 difference if abs(difference) >= 1 else difference * 60,
-                " h" if abs(difference) >= 1 else " min",
+                " h" if abs(difference) >= 1 else " m",
         )
         os.system(
             "notify-send \"" + title + "\" " + " \"" +
