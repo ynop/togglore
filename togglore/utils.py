@@ -10,6 +10,13 @@ def sum_time_of_entries(entries):
 
     return ms / 3600000.0
 
+def get_time_of_running_entry(entry):
+    if not entry:
+        return 0.0
+    current_time = int(datetime.datetime.now().strftime("%s"))
+    duration = int(entry['duration'])
+    return (current_time + duration) / 3600.0
+
 
 class WorkTimeCalculator(object):
     def __init__(self, work_hours_per_day=8.4, excluded_days=[]):
@@ -58,8 +65,24 @@ class DateRange(object):
     @classmethod
     def this_week(cls):
         today = datetime.date.today()
-        start = today - datetime.timedelta(today.weekday())
+        start = today - datetime.timedelta(today.weekday() + 1)
         end = start + datetime.timedelta(6)
+
+        return cls(start, end)
+    
+    @classmethod
+    def last_week(cls):
+        today = datetime.date.today()
+        end = today - datetime.timedelta(today.weekday() + 1) - datetime.timedelta(1)
+        start = end - datetime.timedelta(6)
+
+        return cls(start, end)
+
+    @classmethod
+    def this_week_until_today(cls):
+        today = datetime.date.today()
+        start = today - datetime.timedelta(today.weekday())
+        end = today
 
         return cls(start, end)
 
@@ -71,12 +94,43 @@ class DateRange(object):
         end = datetime.date(today.year, today.month, end_day)
 
         return cls(start, end)
+    
+    @classmethod
+    def last_month(cls):
+        today = datetime.date.today()
+        month = today.month - 1
+        year = today.year
+        if month == 0:
+            month = 12
+            year = year - 1
+        __, end_day = calendar.monthrange(year, month)
+        start = datetime.date(year, month, 1)
+        end = datetime.date(year, month, end_day)
+
+        return cls(start, end)
+
+    @classmethod
+    def this_month_until_today(cls):
+        today = datetime.date.today()
+        __, end_day = calendar.monthrange(today.year, today.month)
+        start = datetime.date(today.year, today.month, 1)
+        end = today
+
+        return cls(start, end)
 
     @classmethod
     def this_year(cls):
         today = datetime.date.today()
         start = datetime.date(today.year, 1, 1)
         end = datetime.date(today.year, 12, 31)
+
+        return cls(start, end)
+
+    @classmethod
+    def this_year_until_today(cls):
+        today = datetime.date.today()
+        start = datetime.date(today.year, 1, 1)
+        end = today
 
         return cls(start, end)
 
