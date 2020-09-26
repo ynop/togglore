@@ -92,3 +92,10 @@ ENV/
 .idea
 
 .cache*
+
+Pipfile
+Pipfile.lock
+credentials.json
+tags
+token.pickle
+
