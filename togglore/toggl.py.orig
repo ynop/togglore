@@ -1,30 +1,17 @@
+import urllib
+import urllib.request
+import urllib.parse
 import base64
 import json
-import urllib
-from urllib.parse import urlparse
 
 
 class TogglClient(object):
-    _user = None
-
-    def __init__(self, api_token):
+    def __init__(self, api_token, user_id, workspace):
         self.api_token = api_token
+        self.user_id = user_id
+        self.workspace = workspace
         self.headers = {}
         self.__init_headers()
-
-    @property
-    def user(self):
-        if not self._user:
-            self._user = self.request('https://api.track.toggl.com/api/v8/me')
-        return self._user
-
-    @property
-    def user_id(self):
-        return self.user['data']['id']
-
-    @property
-    def workspaces(self):
-        return [ws['id'] for ws in self.user['data']['workspaces']]
 
     def __init_headers(self):
         auth_header = self.api_token + ":" + "api_token"
@@ -47,7 +34,7 @@ class TogglClient(object):
 
         return json.loads(response.decode('utf8'))
 
-    def time_entries(self, workspace, date_range):
+    def time_entries(self, date_range):
         entries = []
 
         total = 1
@@ -57,17 +44,13 @@ class TogglClient(object):
         while current_page * per_page < total:
             current_page += 1
             response = self.request(
-                'https://toggl.com/reports/api/v2/details?'
-                'workspace_id={}&since={}&until={}'
-                '&user_agent=togglore&page={}'.format(
-                    workspace,
-                    date_range.start.isoformat(), date_range.end.isoformat(),
-                    current_page)
-            )
+                'https://toggl.com/reports/api/v2/details?workspace_id={}&since={}&until={}&user_agent=togglore&page={}'.format(
+                    self.workspace, date_range.start.isoformat(), date_range.end.isoformat(), current_page))
             total = response['total_count']
             per_page = response['per_page']
-
             for time in response['data']:
-                entries.append(time)
+                if str(time['uid']) == self.user_id:
+                    entries.append(time)
 
         return entries
+

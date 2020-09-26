@@ -1,6 +1,7 @@
 import datetime
 import calendar
 import math
+from datetime import timedelta
 
 
 def calculate_vacation_demand(entered_on, days_per_year):
@@ -98,3 +99,94 @@ class DateRange(object):
         end = datetime.date(today.year, month, end_day)
 
         return cls(start, end)
+
+
+def get_weekends(since=None):
+    """
+    get all weekend days since a given date up until today
+    :param since: datetime.date
+    :return: list of datetime.date of weekend days.
+    """
+    if not since:
+        since = datetime.date(2014,1,1)
+
+    to = datetime.date.today()
+    delta = to - since
+
+    weekend_days = []
+
+    for i in range(delta.days + 1):
+        day = since + timedelta(days=i)
+        if day.weekday() >= 5:
+            weekend_days.append(day)
+
+    return weekend_days
+
+
+def annotate_weekday_name(dates):
+    annotated = {}
+
+    for day in dates:
+        annotated[day.strftime('%Y-%m-%d')] = day.strftime("%A")
+
+    return annotated
+
+
+def reduce(*event_lists):
+    """
+    intersect all events of multiple sources to one dict of date: summary
+    """
+    result = {}
+    for cal_items in event_lists:
+        for item in cal_items:
+            try:
+                ref = item['start'].get('date', None) or item['start'].get('dateTime')
+            except:
+                import ipdb; ipdb.set_trace()
+                print()
+            result[ref] = item['summary']
+
+    return result
+
+
+def append_annotate(*event_lists):
+    """
+    intersect all events of multiple sources to one dict of
+    date: summary + summary + summary
+    """
+    result = {}
+    baselist_keys = event_lists[0].keys()
+    for cal_items in event_lists:
+        for key, value in cal_items.items():
+            if not key in baselist_keys:
+                continue
+            if key in result:
+                result[key] = result[key] + ' | ' + value
+            else:
+                result[key] = value
+    return result
+
+
+def deflate(event):
+    from_date = event['start']['date']
+    to_date = event['end']['date']
+    summary = event['summary']
+
+
+    from_date = datetime.datetime.strptime(from_date, "%Y-%m-%d").date()
+    to_date = datetime.datetime.strptime(to_date, "%Y-%m-%d").date()
+
+    days = [from_date]
+
+    delta = to_date - from_date
+    for i in range(delta.days + 1):
+        cand = from_date + timedelta(days=i)
+        if cand > to_date:
+            break
+        days.append(cand)
+
+    result = {}
+    for day in days:
+        result[day.strftime('%Y-%m-%d')] = event
+
+    return result

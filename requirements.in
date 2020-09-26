@@ -1,0 +1,7 @@
+requests
+ipdb
+python-dateutil
+pip-tools
+pytest
+workalendar
+freezegun

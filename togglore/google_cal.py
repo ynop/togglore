@@ -5,6 +5,8 @@ import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from utils import get_weekends, annotate_weekday_name, reduce, append_annotate, deflate
+
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
@@ -35,25 +37,89 @@ class Calendar(object):
 
         self.service = build('calendar', 'v3', credentials=creds)
 
+    def get_holidays(self):
+        resources = {
+            'en.christian#holiday@group.v.calendar.google.com',
+            'en.austrian#holiday@group.v.calendar.google.com',
+            'de.austrian#holiday@group.v.calendar.google.com',
+        }
+
+        holidays = []
+        for cal in resources:
+            events_result = self.service.events().list(
+                calendarId=cal,
+                timeMin=from_date,
+                # timeMax=to_date,
+                maxResults=2500,
+                # orderBy='startTime'
+            ).execute()
+            events = events_result.get('items', [])
+            for event in events:
+                holidays.append(deflate(event))
+        import ipdb; ipdb.set_trace()
+        return reduce(*holidays)
+
     def get_events_by_name(self, name, from_date=None, to_date=None):
         """Shows basic usage of the Google Calendar API.
         Prints the start and name of the next 10 events on the user's calendar.
         """
         # Call the Calendar API
-        now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-        print('Getting the upcoming 10 events')
+        now = datetime.datetime.utcnow().isoformat()
         events_result = self.service.events().list(
             q=name,
-            calendarId='primary',
-            timeMin=from_date,
-            timeMax=to_date,
+            calendarId='ubergrape.com_450doe35u9mtlhfuuqkr462c6o@group.calendar.google.com',
+            #timeMin=from_date,
+            #timeMax=to_date,
             maxResults=2500,
-            orderBy='startTime'
+            #orderBy='startTime'
         ).execute()
         events = events_result.get('items', [])
 
-        if not events:
-            print('No upcoming events found.')
-        for event in events:
-            start = event['start'].get('dateTime', event['start'].get('date'))
-            print(start, event['summary'])
+        return reduce(events)
+
+
+if __name__ == '__main__':
+    from_date = datetime.date(2017, 8, 1)
+    cal = Calendar()
+
+    weekends = annotate_weekday_name(get_weekends())
+    holidays = cal.get_holidays()
+
+    empl = [
+        {'chris', 'christoph'},
+        {'victor'},
+        {'melanie'},
+        {'stefan'},
+        {'riccardo'},
+        {'blerta'},
+        {'carina'},
+        {'ivan'},
+        {'sandor'},
+        {'oleh'},
+        {'felix'},
+        {'ron'},
+        {'lukas', 'luke'},
+        {'daniele'},
+    ]
+
+    vacations = {}
+    for name in empl:
+        f_name = None
+        empl_vac = {}
+        for nik in name:
+            if not f_name:
+                f_name = nik
+            annotate = f'{nik} vacation'
+            empl_vac = cal.get_events_by_name(f'{nik} vacation', from_date)
+            empl_vac.update(cal.get_events_by_name(f'{nik} holiday', from_date))
+            break
+
+        vacations[f_name] = empl_vac
+        vacations[f_name] = append_annotate(vacations[f_name], weekends, holidays)
+
+        for empl, vacation in vacations:
+            print('__________________________________________-')
+            print(f'{empl}\'s vacations:')
+            print(vacations)
+
+        print(vacations)

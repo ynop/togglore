@@ -3,6 +3,13 @@ Tool for the timetracker [toggle](http://toggl.com/) to calculate the difference
 
 ## Setup
 
+# dev environment
+create a python 3.8 venv
+`virtualenv -p python3.8 venv` from the root of the repository 
+and activate it `. venv/bin/activate`
+then install the requirements `pip install -r requirements.txt`
+
+
 Create a config file and save it at ~/.togglore.
 ```sh
 [Authentication]
