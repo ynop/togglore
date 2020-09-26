@@ -36,7 +36,7 @@ MON, TUE, WED, THU, FRI, SAT, SUN = range(1, 8)
 vacations = [
     # mapping of start, end
     (datetime.date(2017, 11, 9), datetime.date(2017, 11, 14)),
-    (datetime.date(2017, 3, 12), datetime.date(2017, 3, 16)),
+    (datetime.date(2018, 3, 12), datetime.date(2018, 3, 16)),
     (datetime.date(2018, 4, 4), datetime.date(2018, 4, 12)),
     (datetime.date(2018, 7, 26), datetime.date(2018, 7, 27)),
     (datetime.date(2018, 9, 25), datetime.date(2018, 10, 4)),
@@ -68,22 +68,24 @@ class LifeWorkBalance(object):
     cal_non_working_days = None
     cal_working_days = None
     time_entries = None
+    map = None
 
     def __init__(
             self, calendar, client, vacations, employment_started,
             weekly_working_days, refresh=False):
 
+        self.map = {}
         self.client = client
         self.cal = calendar
         self.vacations = vacations
         self.weekly_working_days = weekly_working_days
         self.today = datetime.date.today()
         self.employment_started = employment_started
-
-
         self._deflate_vacations()
         self._fetch_time_entries(refresh)
         self._generate_calendar()
+        self._structure_time_entries()
+
 
     @property
     def employment_duration(self):
@@ -116,6 +118,17 @@ class LifeWorkBalance(object):
     def vacation_days_claim(self):
         return (int(self.employment_duration.days / 365) + 1) \
                * 25 / 5 * len(self.weekly_working_days)
+
+    def _add_day_to_map(self, label, working_day, note=None):
+        self.map[label] = {
+            'working_day': bool(working_day),
+            'hours_actually_worked': 0,
+            'hours_should_worked': 8 if working_day else 0,
+            'note': note or '',
+        }
+
+    def _add_worktime_to_map(self, label, hours):
+        self.map[label]['hours_actually_worked'] += hours
 
     def _deflate_vacations(self):
         vacation_days = []
@@ -166,29 +179,78 @@ class LifeWorkBalance(object):
         self.time_entries = user_entries
         save_obj(user_entries, cache_name)
 
+    def _structure_time_entries(self):
+        for te in self.time_entries:
+            self._add_worktime_to_map(
+                te['start'].split('T')[0], te['dur'] / 3600 / 1000
+            )
+
     def _generate_calendar(self):
         self.cal_working_days = []
         self.cal_non_working_days = []
         self.cal_vacation_days_countable = []
+
         ref = self.employment_started - relativedelta(days=1)
         while ref < self.today:
             ref = ref + relativedelta(days=1)
+            label = ref.isoformat()
             if not cal.is_working_day(ref):
-                reason = cal.get_holiday_label(ref) or 'weekend.'
+                reason = cal.get_holiday_label(ref) or 'weekend'
                 print(f'-- {ref} is {reason}')
                 self.cal_non_working_days.append(ref)
+                self._add_day_to_map(label, False, reason)
                 continue
+
             if ref.isoweekday() not in self.weekly_working_days:
                 print(f'-- {ref} is not in your working days.')
                 self.cal_non_working_days.append(ref)
+                self._add_day_to_map(label, False, 'free-day')
                 continue
+
             if ref in self.vacation_days_total:
                 print(f'-- {ref} on vacation.')
                 self.cal_vacation_days_countable.append(ref)
+                self._add_day_to_map(label, False, 'vacation')
                 continue
 
             print(f'++ {ref} is a working day.')
             self.cal_working_days.append(ref)
+            self._add_day_to_map(label, True, 'working day')
+
+    def print_calendar(self):
+        head = \
+            f"{'date':<15}" \
+            f"{'workday':<5}" \
+            f"{'should':<5}" \
+            f"{'worked':<5}" \
+            f"{'note':<30}" \
+            f"{'difference':<5}"
+
+        print(head)
+        special_days = []
+
+        for date, entry in self.map.items():
+            diff = entry['hours_actually_worked'] - entry['hours_should_worked']
+            diff_str = format(diff, '.2f')
+
+            sumary = \
+                f"{date:<15}" \
+                f"{entry['working_day']:<5}" \
+                f"{entry['hours_should_worked']:<5}" \
+                f"{format(entry['hours_actually_worked'], '.2f'):<10}" \
+                f"{entry['note']:<30}" \
+                f"{diff_str:<5}"
+
+            if diff < -4 or diff > 4:
+                special_days.append(sumary)
+
+            print(sumary)
+
+        if special_days:
+            print('found some extreme days, did you forget to map?')
+            print(head)
+            for sd in special_days:
+                print(sd)
 
 
 balance = LifeWorkBalance(
@@ -199,11 +261,11 @@ balance = LifeWorkBalance(
     # refresh=True
 )
 
+balance.print_calendar()
 print(f'{balance.overtime}h overtime.')
 print(
     f'{balance.used_vacation} vacation days of '
     f'{balance.vacation_days_claim} used.'
 )
 
-print(balance.calendar)
 
