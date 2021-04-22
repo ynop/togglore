@@ -17,15 +17,41 @@ from togglore.utils import DateRange
 logger = logging.getLogger(__name__)
 logger.setLevel('DEBUG')
 
-API_KEY = 'fa85b49a932f6fea291be8ae8a9f7204'
-# user_id = 3577081
-workspace = 2302677
+try:
+    API_KEY = os.environ['API_KEY']
+except KeyError:
+    raise RuntimeError('please set the API_KEY environment variable.')
+
+try:
+    workspace = os.environ['WORKSPACE']
+except KeyError:
+    raise RuntimeError('please set the WORKSPACE environment variable.')
 
 tc = TogglClient(API_KEY)
 cal = Austria()
 
 # assign the order of work days, starting a week with monday (0-7)
 MON, TUE, WED, THU, FRI, SAT, SUN = range(1, 8)
+
+try:
+    rd = os.environ['RECRUITMENT_DATE'].split('.')
+    RECRUITMENT_DATE = datetime.date(*[int(d) for d in rd])
+except KeyError:
+    raise RuntimeError('please set the RECRUITMENT_DATE environment variable.')
+
+try:
+    WORKING_DAYS = [int(wd) for wd in os.environ['WORKING_DAYS'].split(',')]
+except KeyError:
+    raise RuntimeError('please set the WORKING_DAYS environment variable.')
+
+try:
+    HOURS_PER_DAY = int(os.environ['HOURS_PER_DAY'])
+except KeyError:
+    raise RuntimeError('please set the HOURS_PER_DAY environment variable.')
+
+# RECRUITMENT_DATE = datetime.date(2017, 9, 15)
+# WORKING_DAYS = [MON, TUE, THU, FRI]
+# HOURS_PER_DAY = 8
 
 # calculate vacation days
 
@@ -141,7 +167,7 @@ class LifeWorkBalance(object):
 
     @property
     def hours_should_worked(self):
-        return len(self.cal_working_days) * 8
+        return len(self.cal_working_days) * HOURS_PER_DAY
 
     @property
     def overtime(self):
@@ -160,7 +186,7 @@ class LifeWorkBalance(object):
         self.map[label] = {
             'working_day': bool(working_day),
             'hours_actually_worked': 0,
-            'hours_should_worked': 8 if working_day else 0,
+            'hours_should_worked': HOURS_PER_DAY if working_day else 0,
             'note': note or '',
         }
 
@@ -311,8 +337,8 @@ balance = LifeWorkBalance(
     calendar=cal, client=tc,
     vacations=vacations,
     special_vacations=special_vacations,
-    employment_started=datetime.date(2017, 9, 15),
-    weekly_working_days=[MON, TUE, THU, FRI],
+    employment_started=RECRUITMENT_DATE,
+    weekly_working_days=WORKING_DAYS,
     # refresh=True
 )
 
