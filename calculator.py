@@ -2,13 +2,10 @@ import base64
 import datetime
 import itertools
 import json
-import json
 import logging
 import os
 import pickle
-import urllib
 import urllib.request
-from datetime import date, timedelta
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from urllib.parse import urlparse
@@ -32,21 +29,59 @@ MON, TUE, WED, THU, FRI, SAT, SUN = range(1, 8)
 
 # calculate vacation days
 
-# todo import from config file
+# mapping of start, end
 vacations = [
-    # mapping of start, end
+    # marathon
     (datetime.date(2017, 11, 9), datetime.date(2017, 11, 14)),
+    # skiing
     (datetime.date(2018, 3, 12), datetime.date(2018, 3, 16)),
-    (datetime.date(2018, 4, 4), datetime.date(2018, 4, 12)),
+    # cycling bologna
+    (datetime.date(2018, 4, 3), datetime.date(2018, 4, 13)),
+    # schwappla
     (datetime.date(2018, 7, 26), datetime.date(2018, 7, 27)),
-    (datetime.date(2018, 9, 25), datetime.date(2018, 10, 4)),
-    (datetime.date(2019, 2, 19), datetime.date(2019, 2, 22)),
+    # cycling tuscany
+    (datetime.date(2018, 9, 24), datetime.date(2018, 10, 5)),
+    # skiing
+    (datetime.date(2019, 2, 18), datetime.date(2019, 2, 22)),
+    # skiing
     (datetime.date(2019, 3, 11), datetime.date(2019, 3, 12)),
+    # cycling greece
     (datetime.date(2019, 5, 20), datetime.date(2019, 6, 7)),
+    # ccc
+    (datetime.date(2019, 12, 25), datetime.date(2020, 1, 3)),
+    # skiing
     (datetime.date(2020, 3, 9), datetime.date(2020, 3, 12)),
+    # cycling coronapfad
     (datetime.date(2020, 6, 15), datetime.date(2020, 6, 26)),
-    (datetime.date(2020, 8, 18), datetime.date(2020, 8, 21)),
+    # schwappla
+    (datetime.date(2020, 8, 17), datetime.date(2020, 8, 21)),
+    # mtb
     (datetime.date(2020, 9, 4), datetime.date(2020, 9, 4)),
+    # mega tour france/spain (not yet taken)
+    (datetime.date(2021, 5, 3), datetime.date(2021, 5, 31)),
+]
+
+# not counting to vacation days (sick leave, bildungskarenz, moving, ...)
+special_vacations = [
+    # bildungskarenz mitarbeitermotivation
+    (datetime.date(2019, 11, 1), datetime.date(2019, 11, 1)),
+    (datetime.date(2019, 11, 8), datetime.date(2019, 11, 8)),
+    (datetime.date(2019, 11, 15), datetime.date(2019, 11, 15)),
+    (datetime.date(2019, 11, 22), datetime.date(2019, 11, 22)),
+    (datetime.date(2019, 11, 29), datetime.date(2019, 11, 29)),
+
+    # bildungskarenz mitarbeiterfuehrung
+    (datetime.date(2019, 12, 6), datetime.date(2019, 12, 6)),
+    (datetime.date(2019, 12, 13), datetime.date(2019, 12, 13)),
+    (datetime.date(2019, 12, 20), datetime.date(2019, 12, 20)),
+    (datetime.date(2019, 12, 27), datetime.date(2019, 12, 27)),
+
+    # bildungskarenz zeitmanagement
+    (datetime.date(2020, 1, 3), datetime.date(2019, 1, 3)),
+    (datetime.date(2020, 1, 10), datetime.date(2019, 1, 10)),
+    (datetime.date(2020, 1, 17), datetime.date(2019, 1, 17)),
+    (datetime.date(2020, 1, 24), datetime.date(2019, 1, 24)),
+    (datetime.date(2020, 1, 31), datetime.date(2020, 1, 31)),
 ]
 
 
@@ -71,17 +106,19 @@ class LifeWorkBalance(object):
     map = None
 
     def __init__(
-            self, calendar, client, vacations, employment_started,
-            weekly_working_days, refresh=False):
+            self, calendar, client, vacations, special_vacations,
+            employment_started, weekly_working_days, refresh=False):
 
         self.map = {}
         self.client = client
         self.cal = calendar
         self.vacations = vacations
+        self.special_vacations = special_vacations
         self.weekly_working_days = weekly_working_days
         self.today = datetime.date.today()
         self.employment_started = employment_started
         self._deflate_vacations()
+        self._deflate_special_vacations()
         self._fetch_time_entries(refresh)
         self._generate_calendar()
         self._structure_time_entries()
@@ -140,6 +177,17 @@ class LifeWorkBalance(object):
                 print(f'vacation day: {vd}')
         print(f'vacation days entered: {len(vacation_days)}')
         self.vacation_days_total = vacation_days
+
+    def _deflate_special_vacations(self):
+        vacation_days = []
+        for sdate, edate in self.special_vacations:
+            delta = edate - sdate
+            for i in range(delta.days + 1):
+                vd = sdate + timedelta(days=i)
+                vacation_days.append(vd)
+                print(f'special vacation day: {vd}')
+        print(f'special vacation days entered: {len(vacation_days)}')
+        self.special_vacation_days_total = vacation_days
 
     def _fetch_time_entries(self, refresh=False):
         cache_name = 'toggle_entries'
@@ -207,6 +255,12 @@ class LifeWorkBalance(object):
                 self._add_day_to_map(label, False, 'free-day')
                 continue
 
+            # special vacation
+            if ref in self.special_vacation_days_total:
+                print(f'-- {ref} on special vacation.')
+                self._add_day_to_map(label, False, 'special vacation')
+                continue
+
             if ref in self.vacation_days_total:
                 print(f'-- {ref} on vacation.')
                 self.cal_vacation_days_countable.append(ref)
@@ -231,7 +285,7 @@ class LifeWorkBalance(object):
 
         for date, entry in self.map.items():
             diff = entry['hours_actually_worked'] - entry['hours_should_worked']
-            diff_str = format(diff, '.2f')
+            diff_str = format(diff, '+.2f')
 
             sumary = \
                 f"{date:<15}" \
@@ -246,7 +300,7 @@ class LifeWorkBalance(object):
 
             print(sumary)
 
-        if special_days:
+        if special_days and False:
             print('found some extreme days, did you forget to map?')
             print(head)
             for sd in special_days:
@@ -256,6 +310,7 @@ class LifeWorkBalance(object):
 balance = LifeWorkBalance(
     calendar=cal, client=tc,
     vacations=vacations,
+    special_vacations=special_vacations,
     employment_started=datetime.date(2017, 9, 15),
     weekly_working_days=[MON, TUE, THU, FRI],
     # refresh=True
@@ -267,5 +322,3 @@ print(
     f'{balance.used_vacation} vacation days of '
     f'{balance.vacation_days_claim} used.'
 )
-
-
