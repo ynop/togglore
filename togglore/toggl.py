@@ -44,7 +44,7 @@ class TogglClient(object):
         while current_page * per_page < total:
             current_page += 1
             response = self.request(
-                'https://toggl.com/reports/api/v2/details?workspace_id={}&since={}&until={}&user_agent=togglore&page={}'.format(
+                'https://api.track.toggl.com/reports/api/v2/details?workspace_id={}&since={}&until={}&user_agent=togglore&page={}'.format(
                     self.workspace, date_range.start.isoformat(), date_range.end.isoformat(), current_page))
             total = response['total_count']
             per_page = response['per_page']
