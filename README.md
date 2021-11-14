@@ -43,3 +43,39 @@ Hours to do: 176.00h (22.00 days)
 Hours worked: 186.65h (23.33 days)
 Difference: 10.65h (1.33 days)
 ```
+
+# HowTo for Win10, WSLv2, AlpineWSL, Python3.9.5
+```
+apk update
+apk upgrade
+apk add python3 git
+cat .togglore > ~/.togglore
+cd
+git clone https://github.com/ynop/togglore.git
+cd togglore/
+python3 run.py
+time python3 run.py since 2021.11.01
+```
+E-mail notification
+```
+apk add msmtp mailx
+cat /mnt/d/WSL/Alpine/msmtprc > /etc/msmtprc
+ln -sf /usr/bin/msmtp /usr/sbin/sendmail
+cd ~/togglore/
+python3 run.py since 2021.10.1 | mail -s "Toggl" e-mail_user@Your_domain.tld
+```
+
+## or Thanks to christiandt we can use Python2
+```
+apk update
+apk upgrade
+apk add python2 git
+python -m ensurepip --upgrade
+mkdir ~/Dropbox
+cat .togglore > ~/Dropbox/toggl.txt
+cd
+git clone https://github.com/christiandt/togglore.git
+cd togglore/
+pip install -r requirements.txt
+time python run.py since 2021.11.01
+```
